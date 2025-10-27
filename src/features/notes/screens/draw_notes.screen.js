@@ -10,52 +10,20 @@ import {
 import { Canvas, Path, Skia } from "@shopify/react-native-skia";
 import Slider from "@react-native-community/slider";
 import { Buffer } from "buffer";
+import { IconButton } from "react-native-paper";
 
 const { width, height } = Dimensions.get("window");
 
-export default function DrawNotes() {
+export default function DrawNotes({
+  onChange,
+  strokeColor,
+  strokeWidth,
+  penType,
+}) {
   const [paths, setPaths] = useState([]);
   const [currentPath, setCurrentPath] = useState(null);
-  const [strokeColor, setStrokeColor] = useState("#000000");
-  const [strokeWidth, setStrokeWidth] = useState(4);
-  const [penType, setPenType] = useState("pen"); // "pen" | "marker" | "highlighter" | "eraser"
 
   const canvasRef = useRef(null);
-
-  //   const handleTouchStart = (x, y) => {
-  //     const path = Skia.Path.Make();
-  //     path.moveTo(x, y);
-  //     setCurrentPath({
-  //       path,
-  //       color: penType === "eraser" ? "#fafafa" : strokeColor,
-  //       strokeWidth:
-  //         penType === "marker"
-  //           ? strokeWidth * 1.5
-  //           : penType === "highlighter"
-  //           ? strokeWidth * 3
-  //           : strokeWidth,
-  //       blendMode: penType === "highlighter" ? "multiply" : "srcOver",
-  //     });
-  //   };
-
-  //   const handleTouchMove = (x, y) => {
-  //     if (!currentPath) return;
-  //     currentPath.path.lineTo(x, y);
-  //     setCurrentPath({ ...currentPath });
-  //   };
-
-  //   const handleTouchEnd = () => {
-  //     if (currentPath) {
-  //       if (currentPath.points.length === 1) {
-  //         const pt = currentPath.points[0];
-  //         const dotPath = Skia.Path.Make();
-  //         dotPath.addCircle(pt.x, pt.y, currentPath.strokeWidth / 2);
-  //         currentPath.path = dotPath;
-  //       }
-  //       setPaths([...paths, currentPath]);
-  //       setCurrentPath(null);
-  //     }
-  //   };
 
   const handleTouchStart = (x, y) => {
     const path = Skia.Path.Make();
@@ -92,6 +60,7 @@ export default function DrawNotes() {
       }
       setPaths([...paths, currentPath]);
       setCurrentPath(null);
+      onChange && onChange([...paths, currentPath]);
     }
   };
 
@@ -103,11 +72,19 @@ export default function DrawNotes() {
     const fileName = String(Date.now());
     const folder = "Notes";
 
-    canvasRef.current?.save("png", false, folder, fileName, true, false, false);
+    await canvasRef.current?.save(
+      "png",
+      false,
+      folder,
+      fileName,
+      true,
+      false,
+      false
+    );
   };
 
   return (
-    <View style={styles.container}>
+    <View style={{ height: 400, backgroundColor: "#ffffff" }}>
       <Canvas
         ref={canvasRef}
         style={styles.canvas}
@@ -135,79 +112,12 @@ export default function DrawNotes() {
             )
         )}
       </Canvas>
-
-      {/* Pen Controls */}
-      <View style={styles.controls}>
-        <View style={styles.penRow}>
-          {["pen", "marker", "highlighter", "eraser"].map((type) => (
-            <TouchableOpacity
-              key={type}
-              style={[styles.penButton, penType === type && styles.activePen]}
-              onPress={() => setPenType(type)}
-            >
-              <Text style={styles.penText}>{type}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Color palette */}
-        {penType !== "eraser" && (
-          <View style={styles.colorRow}>
-            {[
-              "#000000",
-              "#FF0000",
-              "#00BFFF",
-              "#008000",
-              "#FFA500",
-              "#800080",
-            ].map((color) => (
-              <TouchableOpacity
-                key={color}
-                style={[
-                  styles.colorButton,
-                  {
-                    backgroundColor: color,
-                    borderWidth: strokeColor === color ? 2 : 0,
-                  },
-                ]}
-                onPress={() => setStrokeColor(color)}
-              />
-            ))}
-          </View>
-        )}
-
-        {/* Stroke width */}
-        <View style={styles.sliderRow}>
-          <Text style={{ width: 70 }}>✏️ {strokeWidth}px</Text>
-          <Slider
-            style={{ flex: 1 }}
-            minimumValue={1}
-            maximumValue={20}
-            step={1}
-            value={strokeWidth}
-            onValueChange={setStrokeWidth}
-          />
-        </View>
-
-        {/* Actions */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity style={styles.btn} onPress={handleUndo}>
-            <Text style={styles.btnText}>Undo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.btn} onPress={handleClear}>
-            <Text style={styles.btnText}>Clear</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={handleSaveImage} style={styles.btn}>
-          <Text style={styles.btnText}>Save Image</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fafafa" },
+  container: { flex: 1, backgroundColor: "#636e72" },
   canvas: { flex: 1 },
   controls: {
     padding: 10,

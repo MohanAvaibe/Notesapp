@@ -190,6 +190,15 @@ export const NotesScreen = ({ navigation }) => {
             });
           }}
         />
+        <IconButton
+          color="white"
+          icon="pen"
+          onPress={() => {
+            navigation.navigate("NoteComposer", {
+              noteId: Date.now() + Math.floor(Math.random() * 1000),
+            });
+          }}
+        />
       </PopupMenu>
       <SearchContainer>
         <Search />

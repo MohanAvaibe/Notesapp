@@ -11,6 +11,7 @@ import { NotesScreen } from "../../features/notes/screens/notes.screen";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "styled-components";
 import DrawingNotes from "../../features/notes/screens/draw_notes.screen";
+import NoteComposerScreen from "../../features/notes/screens/NoteComposer.screen";
 const NotesStack = createStackNavigator();
 
 export const NotesNavigator = ({ route, navigation }) => {
@@ -76,6 +77,46 @@ export const NotesNavigator = ({ route, navigation }) => {
         headermode="screen"
         options={({ route }) => ({
           headerTitle: "Draw your note",
+          headerStyle: {
+            backgroundColor: theme.colors.bg.secondary,
+          },
+          headerTintColor: theme.colors.text.primary,
+          headerRight: () => (
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity onPress={() => route.params.undoContent()}>
+                <Ionicons
+                  name="arrow-undo-outline"
+                  size={24}
+                  color={
+                    route.params.contentUndoStackLength > 0
+                      ? theme.colors.text.primary
+                      : theme.colors.text.disabled
+                  }
+                />
+              </TouchableOpacity>
+              <Spacer position="right" size="medium" />
+              <TouchableOpacity onPress={() => route.params.redoContent()}>
+                <Ionicons
+                  name="arrow-redo-outline"
+                  size={24}
+                  color={
+                    route.params.contentRedoStackLength > 0
+                      ? theme.colors.text.primary
+                      : theme.colors.text.disabled
+                  }
+                />
+              </TouchableOpacity>
+              <Spacer position="right" size="medium" />
+            </View>
+          ),
+        })}
+      />
+      <NotesStack.Screen
+        name="NoteComposer"
+        component={NoteComposerScreen}
+        headermode="screen"
+        options={({ route }) => ({
+          headerTitle: "All in page",
           headerStyle: {
             backgroundColor: theme.colors.bg.secondary,
           },
